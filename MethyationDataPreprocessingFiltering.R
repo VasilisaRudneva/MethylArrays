@@ -1,4 +1,3 @@
-### Oct-2018 
 ### Methylation data preprocessing and t-SNE
 suppressMessages(library("minfi")) 
 suppressMessages(library("limma")) 
@@ -11,9 +10,7 @@ suppressMessages(library("weights"))
 PreprocessFilterMethylationData <- function(rgSet, material) {
 
 mSetRaw <- preprocessRaw(rgSet)
-#anno <- CNV.create_anno(array_type = "450k", exclude_regions = exclude_regions, detail_regions = detail_regions)
 all_samples=sampleNames(rgSet)
-#mSetSq <- preprocessQuantile(rgSet)
 
 Meth=log2(minfi::getMeth(mSetRaw))
 Unmeth=log2(minfi::getUnmeth(mSetRaw))
@@ -29,7 +26,6 @@ if (length(unique(data$vector1$mat))>1){
   Meth2=removeBatchEffect(Meth, batch = as.vector(data$vector1$mat))
   Unmeth2=removeBatchEffect(Unmeth, batch = as.vector(data$vector1$mat))
   
-  # re-transforming the signal untensities back
   Meth=2^Meth2
   Unmeth=2^Unmeth2
 }
@@ -53,7 +49,7 @@ keep <- !(featureNames(mSetRaw) %in% annThisArrayType$Name[annThisArrayType$chr 
 table(keep)
 mSetRaw <- mSetRaw[keep,]; dim(mSetRaw)
 # exclude cross reactive probes
-xReactiveProbes <- read.csv(file="/Users/vrudneva/Dropbox/scripts/MethylationProbes_to_filter/450k/48639-non-specific-probes-Illumina450k.csv", stringsAsFactors=FALSE) 
+xReactiveProbes <- read.csv(file="/Users/rudneva/scripts/MethylationProbes_to_filter/450k/48639-non-specific-probes-Illumina450k.csv", stringsAsFactors=FALSE) 
 keep <- !(featureNames(mSetRaw) %in% xReactiveProbes$TargetID)
 table(keep)
 mSetRaw <- mSetRaw[keep,]
@@ -67,7 +63,7 @@ mSetRaw <- mSetRaw[keep,]
 dim(mSetRaw)
 # remove probes that are not uniquely mapped to the hg19 genome
 # BOWTIE2 multi-mapped
-multi.map <- read.csv('/Users/vrudneva/Dropbox/scripts/MethylationProbes_to_filter/450k/HumanMethylation450_15017482_v.1.1_hg19_bowtie_multimap.txt', head = F, as.is = T)
+multi.map <- read.csv('/Users/rudneva/scripts/MethylationProbes_to_filter/450k/HumanMethylation450_15017482_v.1.1_hg19_bowtie_multimap.txt', head = F, as.is = T)
 multi.map.probes <- as.character(multi.map$V1)
 keep <- !(featureNames(mSetRaw) %in% multi.map.probes)
 table(keep)
@@ -79,12 +75,10 @@ if (annotation(rgSet)[[1]] == "IlluminaHumanMethylationEPIC"){
   suppressMessages(library("IlluminaHumanMethylationEPICanno.ilm10b3.hg19"))
   suppressMessages(library("IlluminaHumanMethylationEPICmanifest")) 
   # probes from Pidsley 2016 (EPIC)
-  epic.cross1 <- read.csv('/Users/vrudneva/Dropbox/scripts/MethylationProbes_to_filter/EPIC/13059_2016_1066_MOESM1_ESM.csv', head = T)
-  # epic.cross2 <- read.csv('/Users/vrudneva/Dropbox/scripts/MethylationProbes_to_filter/EPIC/13059_2016_1066_MOESM2_ESM.csv', head = T)
-  # epic.cross3 <- read.csv('/Users/vrudneva/Dropbox/scripts/MethylationProbes_to_filter/EPIC/13059_2016_1066_MOESM3_ESM.csv', head = T)
-  epic.variants1 <- read.csv('/Users/vrudneva/Dropbox/scripts/MethylationProbes_to_filter/EPIC/13059_2016_1066_MOESM4_ESM.csv', head = T)
-  epic.variants2 <- read.csv('/Users/vrudneva/Dropbox/scripts/MethylationProbes_to_filter/EPIC/13059_2016_1066_MOESM5_ESM.csv', head = T)
-  epic.variants3 <- read.csv('/Users/vrudneva/Dropbox/scripts/MethylationProbes_to_filter/EPIC/13059_2016_1066_MOESM6_ESM.csv', head = T)
+  epic.cross1 <- read.csv('/Users/rudneva/scripts/MethylationProbes_to_filter/EPIC/13059_2016_1066_MOESM1_ESM.csv', head = T)
+  epic.variants1 <- read.csv('/Users/rudneva/scripts/MethylationProbes_to_filter/EPIC/13059_2016_1066_MOESM4_ESM.csv', head = T)
+  epic.variants2 <- read.csv('/Users/rudneva/scripts/MethylationProbes_to_filter/EPIC/13059_2016_1066_MOESM5_ESM.csv', head = T)
+  epic.variants3 <- read.csv('/Users/rudneva/scripts/MethylationProbes_to_filter/EPIC/13059_2016_1066_MOESM6_ESM.csv', head = T)
   # additional filter probes
   epic.add.probes <- c(as.character(epic.cross1$X), as.character(epic.variants1$PROBE), as.character(epic.variants2$PROBE), 
                      as.character(epic.variants3$PROBE))
