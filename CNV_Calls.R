@@ -25,15 +25,12 @@ data(RGcontrolSetEx)
 data(exclude_regions)
 data(detail_regions)
 
-targets=read.table("/myproject/Targets.txt", header=T, stringsAsFactors = F); 
+targets=read.table("Targets.txt", header=T, stringsAsFactors = F); 
 dim(targets); colnames(targets)[5]="Basename"; colnames(targets)[4]="Sample_Name"
 targets$Basename=as.character(targets$Basename)
-# Not COG-0332 ==> exclude:
-exclude_COG_0332=c("201985320234_R08C01")
-targets=targets[!targets$Basename %in% exclude_COG_0332, ]
 targetsCOG=targets
 dim(targets)
-load("/myproject/DATA/RData/gSetCOG.RData")
+load("gSetCOG.RData")
 rgSet=rgSetCOG
 
 RGcontrolSetEx=read.metharray.exp("/data/methylation/Normal_Refs/")
@@ -70,7 +67,6 @@ head(output_table)
 Drivers=c("MYCN","GLI2","MYC","PTCH1","PTEN","SUFU","TP53")
 Chromosomes=paste("chr", 1:22, sep="")
 
-#for (a2.filename in metadataInfants[metadataInfants$PID %in% filenames, "METH_450K"])
 index=1
 for (a2.filename in names(query.data))
 {
@@ -98,14 +94,11 @@ for (a2.filename in names(query.data))
   e=ext_low
     #print("Extreme low...")
   for (c in paste("chr", seq(1:22), sep="")){
-      #print(paste(c, " : ", mean(c(sort(e[e$Chromosome==c,]$Start),0)-c(0,sort(e[e$Chromosome==c,]$Start))[1:length(e[e$Chromosome==c,]$Start)]), sep=""))
       qc_out=c(qc_out, mean(c(sort(e[e$Chromosome==c,]$Start),0)-c(0,sort(e[e$Chromosome==c,]$Start))[1:length(e[e$Chromosome==c,]$Start)]))
       
   }
   e=ext_high
-    #print("Extreme high...")
   for (c in paste("chr", seq(1:22), sep="")){
-      #print(paste(c, " : ", mean(c(sort(e[e$Chromosome==c,]$Start),0)-c(0,sort(e[e$Chromosome==c,]$Start))[1:length(e[e$Chromosome==c,]$Start)]), sep=""))
       qc_out=c(qc_out, mean(c(sort(e[e$Chromosome==c,]$Start),0)-c(0,sort(e[e$Chromosome==c,]$Start))[1:length(e[e$Chromosome==c,]$Start)]))
   }
     
@@ -188,7 +181,7 @@ for (a2.filename in names(query.data))
 
 
 write.table(x = output_table, file = paste("CNV_Calls.", today, ".txt", sep=""), sep="\t", col.names = T, row.names = T, quote=F)
-save(output_table, file="/Users/vrudneva/Documents/COG_0331-0332/Analysis/CNV_calls.RData")
+save(output_table, file="CNV_calls.RData")
 
 tab=output_table
 
