@@ -5,17 +5,10 @@ print("Loading dependencies")
 library(minfi)
 
 print("Loading dataset and info")
-load("/Users/vrudneva/Documents/COG_0331-0332/DATA/All_MB.642-samples.rgSet.RData")
-info=read.table("/Users/vrudneva/Documents/COG_0331-0332/Analysis/Final/non-MB_predictions/tSNE_with_Ref/Oct-1-2018.ACNS0331_0332.Subgroup_Annotations.txt", header = T, sep = "\t", stringsAsFactors = F, na.strings = "N/A")
+load("rgSet.RData")
+info=read.table("Subgroup_Annotations.txt", header = T, sep = "\t", stringsAsFactors = F, na.strings = "N/A")
 info=info[,c("idat", "Trial", "Batch", "PatientUSI", "batch", "sample", "prep", "array", "prediction")]; colnames(info)[9]="MNP_Subgroup"
 head(info); dim(info)
-
-#print("preprocessRaw")
-#mset=preprocessRaw(rgSet); rm(rgSet)
-#print("ratioConvert")
-#RSet <- ratioConvert(mset, what = "both", keepCN = TRUE); rm(mset)
-#print("mapToGenome")
-#GRset <- mapToGenome(RSet)
 
 for (i in 1:6){
   print(i)
@@ -33,10 +26,10 @@ for (i in 1:6){
   colnames(sex_prediction)=c("idat", "predicted_sex")
   out.tmp=merge(sex_prediction, info, by="idat")
   head(out.tmp); dim(out.tmp)
-  known=read.table("/Users/vrudneva/Documents/COG_0331-0332/DATA/SexandAgePtListsforACNS0331and0332.forR.txt", header = T, sep = "\t", stringsAsFactors = F)
+  known=read.table("SexandAgePtLists.forR.txt", header = T, sep = "\t", stringsAsFactors = F)
   colnames(out.tmp)[5]="USI_PatientID"
   results=merge(known, out.tmp, by="USI_PatientID")
-  write.table(results, file=paste0("/Users/vrudneva/Documents/COG_0331-0332/ACNS0331_0332_Sex_Predictions.",i, ".txt"), quote = F, sep = "\t", col.names = T, row.names = F)
+  write.table(results, file=paste0("Sex_Predictions.",i, ".txt"), quote = F, sep = "\t", col.names = T, row.names = F)
 }
 i=7
 sel.samples=sampleNames(rgSet)[601:dim(rgSet)[2]]
@@ -48,17 +41,17 @@ sex_prediction=data.frame(cbind(colnames(GRset), getSex(GRset, cutoff = -2)$pred
 colnames(sex_prediction)=c("idat", "predicted_sex")
 out.tmp=merge(sex_prediction, info, by="idat")
 head(out.tmp); dim(out.tmp)
-known=read.table("/Users/vrudneva/Documents/COG_0331-0332/DATA/SexandAgePtListsforACNS0331and0332.forR.txt", header = T, sep = "\t", stringsAsFactors = F)
+known=read.table("SexandAgePtLists.forR.txt", header = T, sep = "\t", stringsAsFactors = F)
 colnames(out.tmp)[5]="USI_PatientID"
 results=merge(known, out.tmp, by="USI_PatientID")
-write.table(results, file=paste0("/Users/vrudneva/Documents/COG_0331-0332/ACNS0331_0332_Sex_Predictions.",i, ".txt"), quote = F, sep = "\t", col.names = T, row.names = F)
+write.table(results, file=paste0("ex_Predictions.",i, ".txt"), quote = F, sep = "\t", col.names = T, row.names = F)
 
 
 ### making plots
-submitted_dna=read.xls("/Users/vrudneva/Documents/COG_0331-0332/Copy of Summary for the DNA extraction for Dr. Northcott-July-19-18.xlsx", sheet = 2)
+submitted_dna=read.xls("Summary_DNA_extraction.xlsx", sheet = 2)
 submitted_dna=submitted_dna[c("PatientUSI", "Total.DNA..ng.")]
 colnames(submitted_dna)[1]="USI_PatientID"
-result1=read.xls("/Users/vrudneva/Documents/COG_0331-0332/ACNS0331_0332_Sex_Predictions.xlsx", sheet = 1)
+result1=read.xls("Sex_Predictions.xlsx", sheet = 1)
 results=merge(result1, submitted_dna, by="USI_PatientID"); head(results); dim(results)
 
 concordant=results[results$Gender==results$predicted_sex,]; dim(concordant)
@@ -76,7 +69,7 @@ library("ggplot2")
 ddf=melt(df)
 
 
-pdf(paste0("/Users/vrudneva/Documents/COG_0331-0332/Sample_swap/", today,".Boxplots_TotalDNA.pdf"), paper="a4", onefile=TRUE, useDingbats=FALSE)
+pdf(paste0("Sample_swap/", today,".Boxplots_TotalDNA.pdf"), paper="a4", onefile=TRUE, useDingbats=FALSE)
 ggplot(ddf, aes(x=Status, y=value, color=Gender)) + 
   geom_boxplot(outlier.shape=NA) + #avoid plotting outliers twice
   geom_jitter(position=position_jitter(width=.1, height=0))+
@@ -100,8 +93,8 @@ library("reshape")
 library("ggplot2")
 require("gdata")
 
-load("/Users/vrudneva/Documents/COG_0331-0332/DATA/All_MB.642-samples.rgSet.RData")
-info=read.table("/Users/vrudneva/Documents/COG_0331-0332/Analysis/Final/non-MB_predictions/tSNE_with_Ref/Oct-1-2018.ACNS0331_0332.Subgroup_Annotations.txt", header = T, sep = "\t", stringsAsFactors = F, na.strings = "N/A")
+load("rgSet.RData")
+info=read.table("Subgroup_Annotations.txt", header = T, sep = "\t", stringsAsFactors = F, na.strings = "N/A")
 info=info[,c("idat", "Trial", "Batch", "PatientUSI", "batch", "sample", "prep", "array", "prediction")]; colnames(info)[9]="MNP_Subgroup"
 head(info); dim(info)
 badSampleCutoff=10.5
@@ -112,10 +105,10 @@ whichBad <- which((meds < badSampleCutoff))
 badSamples=rownames(qc)[whichBad]
 plotQC(qc)
 
-submitted_dna=read.xls("/Users/vrudneva/Documents/COG_0331-0332/Copy of Summary for the DNA extraction for Dr. Northcott-July-19-18.xlsx", sheet = 2)
+submitted_dna=read.xls("Summary_DNA_extraction.xlsx", sheet = 2)
 submitted_dna=submitted_dna[c("PatientUSI", "Total.DNA..ng.")]
 colnames(submitted_dna)[1]="USI_PatientID"
-result1=read.xls("/Users/vrudneva/Documents/COG_0331-0332/ACNS0331_0332_Sex_Predictions.xlsx", sheet = 1)
+result1=read.xls("Sex_Predictions.xlsx", sheet = 1)
 results=merge(result1, submitted_dna, by="USI_PatientID"); 
 results$QC=rep("Pass", dim(results)[1])
 results[results$idat %in% badSamples,"QC"]="Fail"
@@ -130,7 +123,7 @@ df=data.frame(rbind(df1, df2))
 
 ddf=melt(df)
 
-pdf(paste0("/Users/vrudneva/Documents/COG_0331-0332/Sample_swap/", today,".Boxplots_TotalDNA_QC.pdf"), paper="a4", onefile=TRUE, useDingbats=FALSE)
+pdf(paste0("Sample_swap/", today,".Boxplots_TotalDNA_QC.pdf"), paper="a4", onefile=TRUE, useDingbats=FALSE)
 ggplot(ddf, aes(x=Status, y=value, color=QC)) + 
   geom_boxplot(outlier.shape=NA) + #avoid plotting outliers twice
   geom_jitter(position=position_jitter(width=.1, height=0))+
@@ -157,7 +150,7 @@ df=data.frame(rbind(df1, df2))
 
 ddf=melt(df)
 
-pdf(paste0("/Users/vrudneva/Documents/COG_0331-0332/Sample_swap/", today,".Boxplots_TotalDNA_QC.pdf"), paper="a4", onefile=TRUE, useDingbats=FALSE)
+pdf(paste0("Sample_swap/", today,".Boxplots_TotalDNA_QC.pdf"), paper="a4", onefile=TRUE, useDingbats=FALSE)
 p=ggplot(ddf, aes(x=Status, y=value, color=QC)) + 
   geom_boxplot(outlier.shape=NA) + #avoid plotting outliers twice
   geom_jitter(position=position_jitter(width=.1, height=0))+
