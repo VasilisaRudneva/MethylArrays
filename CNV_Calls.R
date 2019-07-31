@@ -30,8 +30,8 @@ dim(targets); colnames(targets)[5]="Basename"; colnames(targets)[4]="Sample_Name
 targets$Basename=as.character(targets$Basename)
 targetsCOG=targets
 dim(targets)
-load("gSetCOG.RData")
-rgSet=rgSetCOG
+load("rgSet.RData")
+rgSet
 
 RGcontrolSetEx=read.metharray.exp("/data/methylation/Normal_Refs/")
 MsetControls <- preprocessRaw(RGcontrolSetEx)
