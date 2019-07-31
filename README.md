@@ -8,7 +8,7 @@ Create_rgSet.R
 Calculate_betas.R
 CNV_Calls.R
 ```
-## Alternative
+### Alternative
 
 ```
 InfantMB/R/CreateRGSet.R
